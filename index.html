@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="description" content="NeurIPS 2025 Poster &mdash; Orthogonal residual updates stabilize residual streams and improve accuracy on CIFAR, Tiny ImageNet, and ImageNet-1k.">
+  <meta name="keywords" content="orthogonal residual update, neurips 2025 poster, vision transformer, resnet, generalization, training stability">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Orthogonal Residual Update</title>
+
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Google+Sans|Noto+Sans|Castoro">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.1/css/bulma.min.css">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css">
+  <link rel="stylesheet" href="./static/css/index.css">
+  <link rel="icon" href="https://cdn-icons-png.flaticon.com/512/954/954591.png">
+</head>
+
+<body>
+
+  <section class="hero">
+    <div class="hero-body">
+      <div class="container is-max-desktop">
+        <div class="columns is-centered">
+          <div class="column has-text-centered">
+            <h1 class="title is-1 publication-title">Revisiting Residual Connections</h1>
+            <h3 class="title is-3 publication-title">Orthogonal Updates for Stable and Efficient Deep Networks</h3>
+            <span class="tag is-danger is-light is-medium" style="margin-bottom: 1rem;">NeurIPS 2025 Poster</span>
+
+            <div class="is-size-5 publication-authors">
+              <span class="author-block">
+                <span style="color:#f68946;">Giyeong Oh</span><sup>&#x2666;</sup>,
+              </span>
+              <span class="author-block">
+                <span style="color:#008AD7;">Woohyun Cho</span><sup>&#x2666;</sup>,
+              </span>
+              <span class="author-block">
+                <span style="color:#F2A900;">Siyeol Kim</span><sup>&#x2666;</sup>,
+              </span>
+              <span class="author-block">
+                <span style="color:#f68946;">Suhwan Choi</span><sup>&#x2665;</sup>,
+              </span>
+              <span class="author-block">
+                <span style="color:#008AD7;">Youngjae Yu</span><sup>&#x2660;</sup><sup>&dagger;</sup>
+              </span>
+            </div>
+
+            <div class="is-size-5 publication-authors">
+              <span class="author-block"><b style="color:#f68946; font-weight:normal">&#x25B6 </b> Yonsei University<sup>&#x2666;</sup></span>
+              <span class="author-block"><b style="color:#008AD7; font-weight:normal">&#x25B6 </b> Maum.AI<sup>&#x2665;</sup></span>
+              <span class="author-block"><b style="color:#F2A900; font-weight:normal">&#x25B6 </b> Seoul National University<sup>&#x2660;</sup></span>
+            </div>
+
+            <div class="is-size-6 publication-authors">
+              <span class="author-block"><sup>&dagger;</sup>Corresponding author</span>
+            </div>
+
+            <div class="column has-text-centered">
+              <div class="publication-links">
+                <span class="link-block">
+                  <a href="https://arxiv.org/abs/2505.11881" target="_blank" class="external-link button is-normal is-rounded is-dark">
+                    <span class="icon">
+                      <i class="ai ai-arxiv"></i>
+                    </span>
+                    <span>arXiv</span>
+                  </a>
+                </span>
+                <span class="link-block">
+                  <a href="https://github.com/BootsofLagrangian/ortho-residual" target="_blank" class="external-link button is-normal is-rounded is-dark">
+                    <span class="icon">
+                      <i class="fab fa-github"></i>
+                    </span>
+                    <span>Code</span>
+                  </a>
+                </span>
+                <span class="link-block">
+                  <a href="https://huggingface.co/BootsofLagrangian/ortho-vit-b-imagenet1k-hf" target="_blank" class="external-link button is-normal is-rounded is-dark">
+                    <span class="icon">
+                      <i class="fas fa-share-square"></i>
+                    </span>
+                    <span>Model</span>
+                  </a>
+                </span>
+              </div>
+            </div>
+
+            <p class="subtitle is-5" style="margin-top: 1.5rem;">
+              Our poster distills Orthogonal Residual Update into a plug-and-play drop-in for residual blocks, along with reproducible training recipes and diagnostics.
+            </p>
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="hero teaser">
+    <div class="container is-max-desktop">
+      <div class="hero-body">
+        <div class="content has-text-centered">
+          <h4 class="title is-4">What we set out to test</h4>
+          <ul style="list-style: disc; text-align: left; max-width: 780px; margin: 0 auto;">
+            <li><strong>Hypothesis:</strong> Standard residual updates mostly rescale or flip the stream because their outputs align with the current representation; forcing updates to be orthogonal should unlock unused capacity.</li>
+            <li><strong>Intervention:</strong> Project each block's output onto the subspace perpendicular to the incoming stream &mdash; add only <code>f<sub>&perp;</sub></code>.</li>
+            <li><strong>Evaluation:</strong> Train ResNetV2 and ViT models from scratch on CIFAR-10/100, Tiny ImageNet, and ImageNet-1k, tracking accuracy, training efficiency, and residual-stream geometry.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container is-max-desktop">
+      <div class="columns is-centered has-text-centered">
+        <div class="column is-six-fifths">
+          <h2 class="title is-3">Highlights</h2>
+        </div>
+      </div>
+      <div class="columns">
+        <div class="column">
+          <div class="card">
+            <div class="card-content">
+              <p class="title is-5">Residual streams stay balanced</p>
+              <p class="content">Orthogonal updates avoid runaway norms and prevent layers from collapsing into a single direction, yielding steadier training trajectories.</p>
+            </div>
+          </div>
+        </div>
+        <div class="column">
+          <div class="card">
+            <div class="card-content">
+              <p class="title is-5">Accuracy gains where depth matters</p>
+              <p class="content">Vision Transformers benefit the most: ViT-B improves ImageNet-1k Acc@1 by <strong>+3.78 points</strong> with the same training recipe.</p>
+            </div>
+          </div>
+        </div>
+        <div class="column">
+          <div class="card">
+            <div class="card-content">
+              <p class="title is-5">Poster-ready diagnostics</p>
+              <p class="content">The poster features block-wise cosine and norm traces, ablations on update probability, and throughput numbers to understand the mechanism.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" style="background-color:#efeff081">
+    <div class="container is-max-desktop">
+      <div class="columns is-centered has-text-centered">
+        <div class="column is-six-fifths">
+          <h2 class="title is-3">Method Sketch</h2>
+          <p class="content has-text-justified">
+            Each block decomposes its output into components parallel and orthogonal to the incoming stream vector. We discard the parallel part and add only the orthogonal component to the residual pathway, which acts like a rotation on the representation manifold. The original module is untouched and still learns freely.
+          </p>
+          <figure style="margin-top: 1.5rem;">
+            <img class="figure-img" src="images/figure_1_ours.png" alt="Orthogonal residual update illustration">
+            <figcaption class="has-text-grey">Orthogonal Residual Update keeps only the novelty term <code>f<sub>&perp;</sub></code>.</figcaption>
+          </figure>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container is-max-desktop">
+      <div class="columns is-centered has-text-centered">
+        <div class="column is-six-fifths">
+          <h2 class="title is-3">Key Results</h2>
+          <p class="content has-text-justified">
+            Accuracy numbers report Val Acc@1 averaged over five runs (five best epochs each). Gains are upstream of pre-training: every model is trained from scratch using the baseline recipe.
+          </p>
+        </div>
+      </div>
+      <div class="table-container">
+        <table class="table is-fullwidth is-striped is-hoverable">
+          <thead>
+            <tr>
+              <th>Architecture</th>
+              <th>Connection</th>
+              <th>CIFAR-10</th>
+              <th>CIFAR-100</th>
+              <th>Tiny ImageNet</th>
+              <th>ImageNet-1k</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td rowspan="2">ViT-S</td>
+              <td>Linear</td>
+              <td>89.82 &plusmn; 0.34</td>
+              <td>71.92 &plusmn; 0.24</td>
+              <td>51.30 &plusmn; 0.40</td>
+              <td>70.76 &plusmn; 0.26</td>
+            </tr>
+            <tr>
+              <td><strong>Orthogonal-F</strong></td>
+              <td><strong>90.61 &plusmn; 0.21</strong></td>
+              <td><strong>73.86 &plusmn; 0.31</strong></td>
+              <td><strong>52.57 &plusmn; 0.71</strong></td>
+              <td><strong>72.53 &plusmn; 0.49</strong></td>
+            </tr>
+            <tr>
+              <td rowspan="2">ViT-B</td>
+              <td>Linear</td>
+              <td>87.28 &plusmn; 0.41</td>
+              <td>68.25 &plusmn; 0.88</td>
+              <td>55.29 &plusmn; 0.71</td>
+              <td>73.27 &plusmn; 0.58</td>
+            </tr>
+            <tr>
+              <td><strong>Orthogonal-F</strong></td>
+              <td><strong>88.73 &plusmn; 6.06</strong></td>
+              <td><strong>75.07 &plusmn; 0.43</strong></td>
+              <td><strong>57.87 &plusmn; 0.37</strong></td>
+              <td><strong>77.05 &plusmn; 0.21</strong></td>
+            </tr>
+            <tr>
+              <td rowspan="2">ResNetV2-18</td>
+              <td>Linear</td>
+              <td>95.06 &plusmn; 0.15</td>
+              <td>77.67 &plusmn; 0.28</td>
+              <td>62.04 &plusmn; 0.29</td>
+              <td>&mdash;</td>
+            </tr>
+            <tr>
+              <td><strong>Orthogonal-F</strong></td>
+              <td><strong>95.26 &plusmn; 0.12</strong></td>
+              <td><strong>77.87 &plusmn; 0.27</strong></td>
+              <td><strong>62.65 &plusmn; 0.14</strong></td>
+              <td>&mdash;</td>
+            </tr>
+            <tr>
+              <td rowspan="2">ResNetV2-34</td>
+              <td>Linear</td>
+              <td>95.49 &plusmn; 0.09</td>
+              <td>78.92 &plusmn; 0.31</td>
+              <td>64.61 &plusmn; 0.24</td>
+              <td>&mdash;</td>
+            </tr>
+            <tr>
+              <td><strong>Orthogonal-F</strong></td>
+              <td><strong>95.75 &plusmn; 0.13</strong></td>
+              <td><strong>78.97 &plusmn; 0.04</strong></td>
+              <td><strong>65.46 &plusmn; 0.30</strong></td>
+              <td>&mdash;</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="content has-text-justified">
+        Orthogonal-G behaves similarly on CNNs (see paper for full table). The biggest jumps appear in ViT-B, where residual streams are both long and high-dimensional.
+      </p>
+    </div>
+  </section>
+
+  <section class="section" style="background-color:#efeff081">
+    <div class="container is-max-desktop">
+      <div class="columns is-centered has-text-centered">
+        <div class="column is-six-fifths">
+          <h2 class="title is-3">Training Dynamics</h2>
+          <p class="content has-text-justified">
+            Orthogonal updates accelerate convergence and improve time-to-accuracy on ImageNet-1k with ViT-B/16. Stream norms stay near-constant, so steps act like rotations instead of magnifying the residual.
+          </p>
+        </div>
+      </div>
+      <div class="columns is-centered">
+        <div class="column is-half">
+          <figure>
+            <img class="figure-img" src="images/train_loss_iterations.png" alt="Training loss vs iterations">
+            <figcaption class="has-text-centered has-text-grey">Training loss vs. iterations (ViT-B, ImageNet-1k)</figcaption>
+          </figure>
+        </div>
+        <div class="column is-half">
+          <figure>
+            <img class="figure-img" src="images/val_acc_runtime.png" alt="Validation accuracy vs runtime">
+            <figcaption class="has-text-centered has-text-grey">Validation Acc@1 vs. wall-clock (ViT-B, ImageNet-1k)</figcaption>
+          </figure>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container is-max-desktop">
+      <div class="columns is-centered has-text-centered">
+        <div class="column is-six-fifths">
+          <h2 class="title is-3">Efficiency at a Glance</h2>
+          <p class="content has-text-justified">
+            The orthogonal projection adds <code>O(sd)</code> FLOPs per Transformer block. Measured throughput overhead is small for ViTs and moderate for CNNs.
+          </p>
+        </div>
+      </div>
+      <div class="table-container">
+        <table class="table is-fullwidth is-bordered">
+          <thead>
+            <tr>
+              <th>Architecture</th>
+              <th>Linear (img/s)</th>
+              <th>Ortho-F (img/s)</th>
+              <th>Overhead</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>ResNetV2-34</td>
+              <td>1737.2</td>
+              <td>1634.0</td>
+              <td>5.94%</td>
+            </tr>
+            <tr>
+              <td>ResNetV2-50</td>
+              <td>1002.8</td>
+              <td>876.7</td>
+              <td>12.58%</td>
+            </tr>
+            <tr>
+              <td>ViT-S</td>
+              <td>3476.1</td>
+              <td>3466.3</td>
+              <td>0.28%</td>
+            </tr>
+            <tr>
+              <td>ViT-B</td>
+              <td>1270.1</td>
+              <td>1246.2</td>
+              <td>1.88%</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="content has-text-justified">
+        Feature-wise projection is vectorization friendly and remains negligible compared with attention/FFN FLOPs. See the paper for FLOP breakdowns and mixed-precision implementation tips.
+      </p>
+    </div>
+  </section>
+
+  <section class="section" style="background-color:#efeff081">
+    <div class="container is-max-desktop">
+      <div class="columns is-centered has-text-centered">
+        <div class="column is-six-fifths">
+          <h2 class="title is-3">Inside the Residual Stream</h2>
+          <p class="content has-text-justified">
+            We log how stream norms and parallel energy evolve per block. Linear updates suppress the parallel component and eventually shrink the residual magnitude; orthogonal updates keep energy balanced across depth.
+          </p>
+        </div>
+      </div>
+      <div class="columns is-centered">
+        <div class="column">
+          <figure>
+            <img class="figure-img" src="images/vit_s_tiny_mlp_x_norm.png" alt="MLP stream norm traces">
+            <figcaption class="has-text-centered has-text-grey">Stream norm, MLP blocks (ViT-S, Tiny ImageNet).</figcaption>
+          </figure>
+        </div>
+        <div class="column">
+          <figure>
+            <img class="figure-img" src="images/vit_s_tiny_mlp_parallel.png" alt="MLP parallel component energy traces">
+            <figcaption class="has-text-centered has-text-grey">Parallel component norm, MLP blocks.</figcaption>
+          </figure>
+        </div>
+      </div>
+      <div class="columns is-centered">
+        <div class="column">
+          <figure>
+            <img class="figure-img" src="images/vit_s_tiny_attn_x_norm.png" alt="Attention stream norm traces">
+            <figcaption class="has-text-centered has-text-grey">Stream norm, attention blocks.</figcaption>
+          </figure>
+        </div>
+        <div class="column">
+          <figure>
+            <img class="figure-img" src="images/vit_s_tiny_attn_parallel.png" alt="Attention parallel component energy traces">
+            <figcaption class="has-text-centered has-text-grey">Parallel component norm, attention blocks.</figcaption>
+          </figure>
+        </div>
+      </div>
+      <p class="content has-text-justified">
+        Across both MLP and attention paths, linear updates drive the parallel energy toward zero after the transition point, while orthogonal updates keep it active and stabilize stream norms.
+      </p>
+      <div class="columns is-centered">
+        <div class="column is-two-thirds">
+          <figure>
+            <img class="figure-img" src="images/orthogonal_probability_subplots_final.png" alt="Orthogonal probability ablation">
+            <figcaption class="has-text-centered has-text-grey">Applying orthogonal updates more frequently improves Tiny ImageNet accuracy (ViT-S, N=3).</figcaption>
+          </figure>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container is-max-desktop">
+      <div class="columns is-centered has-text-centered">
+        <div class="column is-six-fifths">
+          <h2 class="title is-3">Resources</h2>
+        </div>
+      </div>
+      <div class="columns">
+        <div class="column">
+          <div class="box">
+            <h3 class="title is-5">Implementation</h3>
+            <p class="content has-text-justified">
+              The GitHub repository documents the full PyTorch implementation, training recipes, and diagnostics we used for the poster. Follow the README workflows for ImageNet-1k and Tiny ImageNet reproductions.
+            </p>
+          </div>
+        </div>
+        <div class="column">
+          <div class="box">
+            <h3 class="title is-5">Trained Models</h3>
+            <p class="content has-text-justified">
+              Hugging Face hosts ViT-B checkpoints and logs under <code>ortho-vit-b-imagenet1k-hf</code>. Toggle the <code>ortho</code> config to switch between feature-wise and global projections.
+            </p>
+          </div>
+        </div>
+        <div class="column">
+          <div class="box">
+            <h3 class="title is-5">Reproducibility</h3>
+            <p class="content has-text-justified">
+              Training scripts, configs, and evaluation notes in the GitHub repo make the experiments fully reproducible end-to-end. Refer to the repository issues and wiki for ongoing updates.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" style="background-color:#efeff081">
+    <div class="container is-max-desktop">
+      <div class="columns is-centered has-text-centered">
+        <div class="column is-six-fifths">
+          <h2 class="title is-3">BibTeX</h2>
+          <div class="content has-text-left">
+<pre>@misc{oh2025revisiting,
+  title        = {Revisiting Residual Connections: Orthogonal Updates for Stable and Efficient Deep Networks},
+  author       = {Giyeong Oh and Woohyun Cho and Siyeol Kim and Suhwan Choi and Youngjae Yu},
+  year         = {2025},
+  eprint       = {2505.11881},
+  archivePrefix= {arXiv},
+  primaryClass = {cs.LG}
+}</pre>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container is-max-desktop">
+      <div class="columns is-centered has-text-centered">
+        <div class="column is-six-fifths">
+          <h2 class="title is-3">Acknowledgements & Licensing</h2>
+          <div class="content has-text-justified">
+            <p>
+              This project page follows the presentation style pioneered by the Nerfies and LLaVA websites, both shared under the CC BY-SA 4.0 license. We thank the open-source community for releasing tooling and templates that made this work possible.
+            </p>
+            <p>
+              Usage and License Notices: All code, data pointers, and checkpoints linked from the Orthogonal Residual Update project are intended for research use only. Please ensure your usage complies with the licenses of upstream datasets (e.g., CIFAR, Tiny ImageNet, ImageNet-1k) and any referenced frameworks or pretrained models.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <div class="content has-text-centered">
+      <p>
+        This site adapts the <a href="https://llava-vl.github.io" target="_blank">LLaVA</a> project page, itself derived from the
+        <a href="https://nerfies.github.io" target="_blank">Nerfies</a> template (both licensed CC BY-SA 4.0).<br>
+        Orthogonal Residual Update website content is released under the <a href="https://creativecommons.org/licenses/by-sa/4.0/" target="_blank">CC BY-SA 4.0</a> license unless otherwise noted.
+      </p>
+    </div>
+  </footer>
+
+</body>
+
+</html>
